@@ -29,7 +29,10 @@ import java.util.RandomAccess;
  * 方法从结构上对列表进行修改，否则在任何时间以任何方式对列表进行修改，迭代器都会抛出
  * ConcurrentModificationException。因此，面对并发的修改，迭代器很快就会完全失败，而不是冒着在将来某个不确定时间发生任意不确定行为的风险。
  * 
- * 6.注意，迭代器的快速失败行为无法得到保证，因为一般来说，不可能对是否出现不同步并发修改做出任何硬性保证。快速失败迭代器会尽最大努力抛出 ConcurrentModificationException
+ * 6.注意，迭代器的快速失败行为无法得到保证，因为一般来说，不可能对是否出现不同步并发修改做出任何硬性保证。
+ * 为什么？因为对modCount的操作不是同步的，所以获得iterator后，执行next方法执行checkForComodification方法后，
+ * 执行剩余代码前，modCount可能被修改，这时就不会抛出异常。
+ *  快速失败迭代器会尽最大努力抛出 ConcurrentModificationException
  * 。因此，为提高这类迭代器的正确性而编写一个依赖于此异常的程序是错误的做法：迭代器的快速失败行为应该仅用于检测 bug
  * 
  * 7.实现了RandomAccess接口，RandomAccess接口是一个标志接口，实现者支持快速随机访问
@@ -780,6 +783,7 @@ public class ArrayList7<E> extends AbstractList7<E> implements List<E>, RandomAc
 
 	/**
 	 * An optimized version of AbstractList.Itr
+	 * @Question 为什么说他性能高呢？
 	 */
 	private class Itr implements Iterator<E> {
 		int cursor; // index of next element to return 下一个元素的指针
@@ -792,6 +796,7 @@ public class ArrayList7<E> extends AbstractList7<E> implements List<E>, RandomAc
 
 		@SuppressWarnings("unchecked")
 		public E next() {
+			// 检测modCount是否被修改，是否需要fail-fast
 			checkForComodification();
 			int i = cursor;
 			if (i >= size)
@@ -799,7 +804,9 @@ public class ArrayList7<E> extends AbstractList7<E> implements List<E>, RandomAc
 			Object[] elementData = ArrayList7.this.elementData;
 			if (i >= elementData.length)
 				throw new ConcurrentModificationException();
+			// 当前指针+1
 			cursor = i + 1;
+			// 上个元素指针lastRet 指向之前的cursor
 			return (E) elementData[lastRet = i];
 		}
 
@@ -818,6 +825,9 @@ public class ArrayList7<E> extends AbstractList7<E> implements List<E>, RandomAc
 			}
 		}
 
+		/**
+		 * 判断List的结构是否被修改
+		 */
 		final void checkForComodification() {
 			if (modCount != expectedModCount)
 				throw new ConcurrentModificationException();

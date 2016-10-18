@@ -364,6 +364,19 @@ public class LinkedList7<E> extends AbstractSequentialList<E> implements List<E>
 	}
 
 	/**
+	 * Returns an iterator over the elements in this list (in proper
+	 * sequence).<p>
+	 * <p>
+	 * This implementation merely returns a list iterator over the list.
+	 *
+	 * @return an iterator over the elements in this list (in proper sequence)
+	 */
+	@Override
+	public Iterator<E> iterator() {
+		return super.iterator();
+	}
+
+	/**
 	 * 移除链表的全部元素
 	 */
 	public void clear() {

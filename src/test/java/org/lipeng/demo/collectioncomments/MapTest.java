@@ -39,6 +39,9 @@ public class MapTest {
         }
     }
 
+    /**
+     * 测试keyset
+     */
     @Test
     public void test1() {
         Map<Integer, Integer> map = new HashMap7<>();
@@ -47,10 +50,27 @@ public class MapTest {
         map.put(3, 3);
         map.put(4, 4);
         Set<Integer> keySet = map.keySet();
-        keySet.add(22);
-        System.out.println(keySet);
+        // keySet.add(22); error:throw UnsupportedOperationException
+        map.put(5,5);
+        System.out.println(keySet);//[1, 2, 3, 4, 5] 说明keySet只是一个视图，map对key的增加和删除会同步到keySet中
         Iterator<Integer> it = keySet.iterator();
+        map.put(6,6);
+        while(it.hasNext()){
+            System.out.println(it.next());// error: throw ConcurrentModificationException 获取it后，map.put 方法修改了modCount 造成此异常
+        }
         System.out.println("1111111111111");
+    }
+
+    @Test
+    public void test2() {
+        Map<Integer, Integer> map = new LinkedHashMap7<>();
+        map.put(1, 1);
+        map.put(32, 2);
+        map.put(13, 3);
+        map.put(4, 4);
+        Iterator<Integer> it=map.keySet().iterator();
+        System.out.println("111111111111111111111");
+
     }
 
 

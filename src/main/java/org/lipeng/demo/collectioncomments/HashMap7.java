@@ -718,6 +718,7 @@ public class HashMap7<K, V>
         }
 
         /**
+         * 调用put方法时，如果put已经存在的key时调用，子类重写此方法
          * This method is invoked whenever the value in an entry is
          * overwritten by an invocation of put(k,v) for a key k that's already
          * in the HashMap7.
@@ -767,16 +768,20 @@ public class HashMap7<K, V>
         size++;
     }
 
+    /**
+     * 抽象内部类实现Iterator
+     */
     private abstract class HashIterator<E> implements Iterator<E> {
-        Entry<K, V> next;        // next entry to return
+        Entry<K, V> next;        // next entry to return 下一个节点
         int expectedModCount;   // For fast-fail
-        int index;              // current slot
-        Entry<K, V> current;     // current entry
+        int index;              // current slot 当前节点所在的链表在table中的位置
+        Entry<K, V> current;     // current entry 当前节点
 
         HashIterator() {
             expectedModCount = modCount;
             if (size > 0) { // advance to first entry
                 Entry[] t = table;
+                // 初始化时，next指向table数组上第一个不为空的节点
                 while (index < t.length && (next = t[index++]) == null)
                     ;
             }
@@ -787,12 +792,13 @@ public class HashMap7<K, V>
         }
 
         final Entry<K, V> nextEntry() {
+            // 先判断是否已经被修改（快速失败fail-fast）
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             Entry<K, V> e = next;
             if (e == null)
                 throw new NoSuchElementException();
-
+            //next指向e.next,，如果有值，则不会再到table数组的其他地方找，否则再数组中找到一下个不为空的节点赋予next
             if ((next = e.next) == null) {
                 Entry[] t = table;
                 while (index < t.length && (next = t[index++]) == null)
@@ -805,10 +811,13 @@ public class HashMap7<K, V>
         public void remove() {
             if (current == null)
                 throw new IllegalStateException();
+            // 先判断是否已经被修改（快速失败fail-fast）
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             Object k = current.key;
+            // 将current置为空
             current = null;
+            // 删除目前跌打的节点，并将expectedModCount重新设置为modCount
             HashMap7.this.removeEntryForKey(k);
             expectedModCount = modCount;
         }
@@ -851,6 +860,7 @@ public class HashMap7<K, V>
     private transient Set<Map.Entry<K, V>> entrySet = null;
 
     /**
+     * 返回一个Set 视图，包含全部的key,
      * Returns a {@link Set} view of the keys contained in this map.
      * The set is backed by the map, so changes to the map are
      * reflected in the set, and vice-versa.  If the map is modified
