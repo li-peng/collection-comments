@@ -7,6 +7,7 @@ package org.lipeng.demo.collectioncomments;
 public class User {
     private Integer id;
     private String name;
+    private Integer gender;
     public User(){
 
     }
@@ -38,5 +39,14 @@ public class User {
     public boolean equals(Object obj) {
       //  return true;
         return super.equals(obj);
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public User setGender(Integer gender) {
+        this.gender = gender;
+        return this;
     }
 }

@@ -2,9 +2,7 @@ package org.lipeng.demo.collectioncomments;
 
 import org.junit.Test;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author lipeng
@@ -70,6 +68,22 @@ public class MapTest {
         map.put(4, 4);
         Iterator<Integer> it=map.keySet().iterator();
         System.out.println("111111111111111111111");
+
+    }
+    @Test
+    public void test3() {
+        Map<Integer, Integer> map = new TreeMap<>();
+        map.put(1, 1);
+        map.put(32, 2);
+        map.put(13, 3);
+        map.put(4, 4);
+        Iterator<Integer> it=map.keySet().iterator();
+        System.out.println("111111111111111111111");
+
+    }
+
+    @Test
+    public void test5() {
 
     }
 

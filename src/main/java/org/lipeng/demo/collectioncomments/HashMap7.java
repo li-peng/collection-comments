@@ -18,8 +18,9 @@ import java.util.*;
  * 当哈希表中的条目数超出了加载因子与当前容量的乘积（即 size>capacity * loadFactor）时，则要对该哈希表进行 rehash 操作（即重建内部数据结构），
  * 从而哈希表将具有大约两倍的桶数,以便接收新的元素。
  * <p>
- * 通常，默认加载因子 (.75) 在时间和空间成本上寻求一种折衷。加载因子过高虽然减少了空间开销，但同时也增加了查询成本，因为装载因子约大，产生冲突的可能性就越高，
- * 初始容量时应该考虑到映射中所需的条目数及其加载因子，以便最大限度地减少 rehash 操作次数。如果初始容量大于最大条目数除以加载因子，则不会发生 rehash 操作。
+ * 通常，默认加载因子 (.75) 在时间和空间成本上寻求一种折衷。加载因子过高虽然减少了空间开销，但同时也增加了查询成本，因为装载因子约大，
+ * 产生冲突的可能性就越高，初始容量时应该考虑到映射中所需的条目数及其加载因子，以便最大限度地减少 rehash 操作次数。
+ * 如果初始容量大于最大条目数除以加载因子，则不会发生 rehash 操作。
  * <p>
  * 如果很多映射关系要存储在 HashMap 实例中，则相对于按需执行自动的 rehash 操作以增大表的容量来说，使用足够大的初始容量创建它将使得映射关系能更有效地存储。
  * <p>
@@ -39,7 +40,7 @@ public class HashMap7<K, V>
         implements Map<K, V>, Cloneable, Serializable {
 
     /**
-     * 默认的初始化容量大小 - 必须是2的次幂
+     * 默认的初始化容量大小 - 必须是2的次幂,性能考虑
      *
      * @Quetion why
      */
@@ -353,13 +354,15 @@ public class HashMap7<K, V>
         }
         if (key == null)
             return putForNullKey(value);
+        // 计算hash值
         int hash = hash(key);
+        // 根据hash值和数组的长度计算key存放的位置
         int i = indexFor(hash, table.length);
         for (Entry<K, V> e = table[i]; e != null; e = e.next) {
             Object k;
             if (e.hash == hash && ((k = e.key) == key || key.equals(k))) {
                 //如何判断key是否重复？
-                //根据hash值和key,即 key1.hashCode=key2.hashCode&&(key1==key2||key1.equals(key2))
+                //根据hash值和key,
                 V oldValue = e.value;
                 e.value = value;
                 e.recordAccess(this);
@@ -381,6 +384,7 @@ public class HashMap7<K, V>
                 // 如果之前存在值，返回旧值
                 V oldValue = e.value;
                 e.value = value;
+                // 调用put方法时，如果put已经存在的key时调用，子类重写此方法
                 e.recordAccess(this);
                 return oldValue;
             }
@@ -466,9 +470,10 @@ public class HashMap7<K, V>
                 }
                 // 存入到新数组中的位置(hash不变，容量变化，也可以改变元素的位置)
                 int i = indexFor(e.hash, newCapacity);
-                // 将e的next元素指不向i位置之前的元素，再讲e放到i位置，形成链表
+                // 将e的next元素指向i位置之前的元素(hash冲突)，再讲e放到i位置，形成链表
                 e.next = newTable[i];
                 newTable[i] = e;
+                // 移动指针，处理e.next
                 e = next;
             }
         }

@@ -30,7 +30,7 @@ import java.util.NoSuchElementException;
 
 public class LinkedList7<E> extends AbstractSequentialList<E> implements List<E>, Deque<E>, Cloneable, java.io.Serializable {
 	/**
-	 *  @Question 为什么是transient的
+	 *  @Question 为什么是transient的？不序列化
 	 */
 	transient int size = 0;
 
@@ -429,7 +429,7 @@ public class LinkedList7<E> extends AbstractSequentialList<E> implements List<E>
 	 * 将指定元素添加到链表的指定位置
 	 */
 	public void add(int index, E element) {
-
+		// 判断插入位置是否合理（0<=index<=size）
 		checkPositionIndex(index);
 		if (index == size)
 			// 如果index=size,则将元素插入末尾
@@ -701,6 +701,9 @@ public class LinkedList7<E> extends AbstractSequentialList<E> implements List<E>
 		return new ListItr(index);
 	}
 
+	/**
+	 * linkedList foreach比普通for性能要高是因为，foreach使用此迭代器，利用next指针进行遍历
+	 */
 	private class ListItr implements ListIterator<E> {
 		private Node<E> lastReturned = null;
 		private Node<E> next;

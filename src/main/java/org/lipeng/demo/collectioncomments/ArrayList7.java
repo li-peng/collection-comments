@@ -810,15 +810,22 @@ public class ArrayList7<E> extends AbstractList7<E> implements List<E>, RandomAc
 			return (E) elementData[lastRet = i];
 		}
 
+		/**
+		 * 移除迭代器上一个遍历的元素。
+		 */
 		public void remove() {
 			if (lastRet < 0)
 				throw new IllegalStateException();
 			checkForComodification();
 
 			try {
+				// 移除上一个迭代元素
 				ArrayList7.this.remove(lastRet);
+				// 将next指针指向上个迭代元素。
 				cursor = lastRet;
+				// pre指针指向-1
 				lastRet = -1;
+				// 还原modCount到初始值（因为执行了remove操作，modCount发生了变化）
 				expectedModCount = modCount;
 			} catch (IndexOutOfBoundsException ex) {
 				throw new ConcurrentModificationException();
